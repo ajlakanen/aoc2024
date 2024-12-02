@@ -43,8 +43,7 @@ def part1():
     print(safe)
 
 
-def illegalDistances(myList):
-    distances = []
+def isGoodRow(myList):
     sign = 0
     # 1 for increasing, -1 for decreasing
     if myList[-1] - myList[0] > 0:
@@ -54,21 +53,22 @@ def illegalDistances(myList):
     for j in range(len(myList)):
         if j == 0:
             continue
-        distances.append((myList[j] - myList[j - 1]) * sign)
-    filtered = list(filter(lambda x: x > 3 or x <= 0, distances))
-    return len(filtered) > 0
+        if (myList[j] - myList[j - 1]) * sign < 1 or (
+            myList[j] - myList[j - 1]) * sign > 3:
+            return False
+    return True
 
 
 def part2():
     safe = 0
     for i in range(len(items)):
         nums = list(map(int, items[i]))
-        if not illegalDistances(nums):
+        if isGoodRow(nums):
             safe += 1
         else:
             for j in range(len(nums)):
                 sublist = nums[:j] + nums[j + 1 :]
-                if not illegalDistances(sublist):
+                if isGoodRow(sublist):
                     safe += 1
                     break            
     print(safe)
