@@ -45,28 +45,40 @@ def part1():
 
 def inOrder2(list, ignoresLeft=1):
     i = 1
-    decOrInc = 0
+    decOrInc = list[len(list) - 1] - list[0]
     while i < len(list):
         if list[i] - list[i - 1] < 0:
             if decOrInc > 0:
                 if ignoresLeft == 0:
                     return False
-                return inOrder2(list[:i-1] + list[i:], 0)
-            else:
-                decOrInc = -1
+                # return inOrder2(list[:i] + list[i+1:], 0)
+                a = list[:i] + list[i + 1 :]
+                b = list[: i - 1] + list[i:]
+                # return inOrder2(a, 0) if dist(a) <= dist(b) else inOrder2(b, 0)
+                if list[i] - list[i - 1] > 0:
+                    return inOrder2(a, 0)
+                else: 
+                    return inOrder2(b, 0)
+
         if list[i] - list[i - 1] > 0:
             if decOrInc < 0:
                 if ignoresLeft == 0:
                     return False
-                return inOrder2(list[:i-1] + list[i:], 0)
-            else:
-                decOrInc = 1
-        if list[i] - list[i-1] == 0:
+                # return inOrder2(list[:i] + list[i+1:], 0)
+                a = list[:i] + list[i + 1 :]
+                b = list[: i - 1] + list[i:]
+                return inOrder2(a, 0) if dist(a) <= dist(b) else inOrder2(b, 0)
+
+        if list[i] - list[i - 1] == 0:
             if ignoresLeft == 0:
                 return False
-            return inOrder2(list[:i-1] + list[i:], 0)
+            return inOrder2(list[: i - 1] + list[i:], 0)
         i += 1
     return (True, list, ignoresLeft)
+
+
+def dist(list):
+    return reduce(lambda x, y: x + abs(y[0] - y[1]), zip(list, list[1:]), 0)
 
 
 def checkIfSafe(list, ignoresLeft=1):
@@ -74,13 +86,13 @@ def checkIfSafe(list, ignoresLeft=1):
         if i == 0:
             continue
         if abs(list[i] - list[i - 1]) < 1:
-            if ignoresLeft == 0 or i == len(list) - 1:
+            if ignoresLeft == 0:
                 return False
             else:
                 return checkIfSafe(list[:i] + list[i + 1 :], 0)
 
         if abs(list[i] - list[i - 1]) > 3:
-            if ignoresLeft == 0 or i == len(list) - 1:
+            if ignoresLeft == 0:
                 return False
             else:
                 return checkIfSafe(list[:i] + list[i + 1 :], 0)
@@ -91,15 +103,16 @@ def part2():
     safe = 0
     for i in range(len(items)):
         nums = list(map(int, items[i]))
-        
+
         checkOrder = inOrder2(nums, 1)
 
-        if checkOrder==False:
+        if checkOrder == False:
             continue
 
         if checkIfSafe(checkOrder[1], checkOrder[2]):
             safe += 1
-
+        else:
+            continue
     print(safe)
 
 
