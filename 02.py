@@ -53,8 +53,8 @@ def isGoodRow(myList):
     for j in range(len(myList)):
         if j == 0:
             continue
-        if (myList[j] - myList[j - 1]) * sign < 1 or (
-            myList[j] - myList[j - 1]) * sign > 3:
+        diff = (myList[j] - myList[j - 1]) * sign
+        if diff < 1 or diff > 3:
             return False
     return True
 
