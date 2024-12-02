@@ -43,7 +43,7 @@ def part1():
     print(safe)
 
 
-def inOrder(list, ignoresLeft=1):
+def inOrder2(list, ignoresLeft=1):
     i = 1
     decOrInc = 0
     while i < len(list):
@@ -51,18 +51,22 @@ def inOrder(list, ignoresLeft=1):
             if decOrInc > 0:
                 if ignoresLeft == 0:
                     return False
-                return inOrder(list[:i] + list[i + 1 :], 0)
+                return inOrder2(list[:i-1] + list[i:], 0)
             else:
                 decOrInc = -1
         if list[i] - list[i - 1] > 0:
             if decOrInc < 0:
                 if ignoresLeft == 0:
                     return False
-                return inOrder(list[:i] + list[i + 1 :], 0)
+                return inOrder2(list[:i-1] + list[i:], 0)
             else:
                 decOrInc = 1
+        if list[i] - list[i-1] == 0:
+            if ignoresLeft == 0:
+                return False
+            return inOrder2(list[:i-1] + list[i:], 0)
         i += 1
-    return True
+    return (True, list, ignoresLeft)
 
 
 def checkIfSafe(list, ignoresLeft=1):
@@ -87,13 +91,13 @@ def part2():
     safe = 0
     for i in range(len(items)):
         nums = list(map(int, items[i]))
+        
+        checkOrder = inOrder2(nums, 1)
 
-        decOrInc = nums[1] - nums[0]
-
-        if not inOrder(nums, decOrInc):
+        if checkOrder==False:
             continue
 
-        if checkIfSafe(nums, 1):
+        if checkIfSafe(checkOrder[1], checkOrder[2]):
             safe += 1
 
     print(safe)
