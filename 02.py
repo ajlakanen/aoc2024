@@ -10,12 +10,12 @@ for i in range(len(lines)):
     items.append(re.split(r"\s+", lines[i]))
 
 
-def inOrder(list, decOrInc):
-    sorted = list.copy()
+def inOrder(myList, decOrInc):
+    sorted = myList.copy()
     sorted.sort(reverse=decOrInc < 0)
 
-    for i in range(len(list)):
-        if list[i] != sorted[i]:
+    for i in range(len(myList)):
+        if myList[i] != sorted[i]:
             return False
     return True
 
@@ -43,76 +43,34 @@ def part1():
     print(safe)
 
 
-def inOrder2(list, ignoresLeft=1):
-    i = 1
-    decOrInc = list[len(list) - 1] - list[0]
-    while i < len(list):
-        if list[i] - list[i - 1] < 0:
-            if decOrInc > 0:
-                if ignoresLeft == 0:
-                    return False
-                # return inOrder2(list[:i] + list[i+1:], 0)
-                a = list[:i] + list[i + 1 :]
-                b = list[: i - 1] + list[i:]
-                # return inOrder2(a, 0) if dist(a) <= dist(b) else inOrder2(b, 0)
-                if list[i] - list[i - 1] > 0:
-                    return inOrder2(a, 0)
-                else: 
-                    return inOrder2(b, 0)
-
-        if list[i] - list[i - 1] > 0:
-            if decOrInc < 0:
-                if ignoresLeft == 0:
-                    return False
-                # return inOrder2(list[:i] + list[i+1:], 0)
-                a = list[:i] + list[i + 1 :]
-                b = list[: i - 1] + list[i:]
-                return inOrder2(a, 0) if dist(a) <= dist(b) else inOrder2(b, 0)
-
-        if list[i] - list[i - 1] == 0:
-            if ignoresLeft == 0:
-                return False
-            return inOrder2(list[: i - 1] + list[i:], 0)
-        i += 1
-    return (True, list, ignoresLeft)
-
-
-def dist(list):
-    return reduce(lambda x, y: x + abs(y[0] - y[1]), zip(list, list[1:]), 0)
-
-
-def checkIfSafe(list, ignoresLeft=1):
-    for i in range(len(list)):
-        if i == 0:
+def illegalDistances(myList):
+    distances = []
+    sign = 0
+    # 1 for increasing, -1 for decreasing
+    if myList[-1] - myList[0] > 0:
+        sign = 1
+    else:
+        sign = -1
+    for j in range(len(myList)):
+        if j == 0:
             continue
-        if abs(list[i] - list[i - 1]) < 1:
-            if ignoresLeft == 0:
-                return False
-            else:
-                return checkIfSafe(list[:i] + list[i + 1 :], 0)
-
-        if abs(list[i] - list[i - 1]) > 3:
-            if ignoresLeft == 0:
-                return False
-            else:
-                return checkIfSafe(list[:i] + list[i + 1 :], 0)
-    return True
+        distances.append((myList[j] - myList[j - 1]) * sign)
+    filtered = list(filter(lambda x: x > 3 or x <= 0, distances))
+    return len(filtered) > 0
 
 
 def part2():
     safe = 0
     for i in range(len(items)):
         nums = list(map(int, items[i]))
-
-        checkOrder = inOrder2(nums, 1)
-
-        if checkOrder == False:
-            continue
-
-        if checkIfSafe(checkOrder[1], checkOrder[2]):
+        if not illegalDistances(nums):
             safe += 1
         else:
-            continue
+            for j in range(len(nums)):
+                sublist = nums[:j] + nums[j + 1 :]
+                if not illegalDistances(sublist):
+                    safe += 1
+                    break            
     print(safe)
 
 
