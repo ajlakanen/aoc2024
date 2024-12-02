@@ -1,7 +1,7 @@
 import re
 from functools import reduce
 
-file = open("data/02-example.txt", "r")
+file = open("data/02.txt", "r")
 content = file.read()
 lines = content.split("\n")
 
@@ -42,25 +42,46 @@ def part1():
 
     print(safe)
 
-def decOrInc(list, ignoresLeft = 1):
-    pass
 
-def checkIfSafe(list, ignoresLeft = 1):
+def inOrder(list, ignoresLeft=1):
+    i = 1
+    decOrInc = 0
+    while i < len(list):
+        if list[i] - list[i - 1] < 0:
+            if decOrInc > 0:
+                if ignoresLeft == 0:
+                    return False
+                return inOrder(list[:i] + list[i + 1 :], 0)
+            else:
+                decOrInc = -1
+        if list[i] - list[i - 1] > 0:
+            if decOrInc < 0:
+                if ignoresLeft == 0:
+                    return False
+                return inOrder(list[:i] + list[i + 1 :], 0)
+            else:
+                decOrInc = 1
+        i += 1
+    return True
+
+
+def checkIfSafe(list, ignoresLeft=1):
     for i in range(len(list)):
         if i == 0:
             continue
         if abs(list[i] - list[i - 1]) < 1:
             if ignoresLeft == 0 or i == len(list) - 1:
-                return False            
+                return False
             else:
-                return checkIfSafe(list[:i] + list[i+1:], 0)
+                return checkIfSafe(list[:i] + list[i + 1 :], 0)
 
         if abs(list[i] - list[i - 1]) > 3:
             if ignoresLeft == 0 or i == len(list) - 1:
                 return False
-            else: 
+            else:
                 return checkIfSafe(list[:i] + list[i + 1 :], 0)
     return True
+
 
 def part2():
     safe = 0
@@ -76,6 +97,7 @@ def part2():
             safe += 1
 
     print(safe)
+
 
 part1()
 part2()
