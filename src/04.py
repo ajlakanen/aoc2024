@@ -1,5 +1,3 @@
-import re
-
 file = open("data/04.txt", "r")
 content = file.read()
 lines = content.split("\n")
@@ -39,6 +37,7 @@ def findMAS(i, j):
             if char == searchFor[-1]:
                 found += 1
     return found
+
 
 def part1():
     sum = 0
