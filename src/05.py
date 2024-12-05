@@ -6,20 +6,19 @@ rules = []
 updates = []
 rulesFinished = False
 
-for i in len(lines):
-    if lines[i] == "":
-        rulesFinished = True
+i = 0
+while lines[i] != "":
     rule = [int(x) for x in lines[i].split("|")]
     rules.append(rule)
     i+=1
-
 i+=1
 while i < len(lines):
     line = [int(x) for x in lines[i].split(",")]
     updates.append(line)
     i+=1
 
-print(updates)
+# print(rules)
+# print(updates)
 
 class Item:
     def __init__ (self, value, after):
@@ -34,9 +33,8 @@ def part1():
         else:
             item = list(filter(lambda item: item.value == rule[0], ordering))[0]
             item.after.append(rule[1])
-        
     
-    
+
     # map(lambda item: print(item.value, item.after), ordering)
     # ordering.map(lambda item: print(item.value, item.after))
     # print(ordering)
