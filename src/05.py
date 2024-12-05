@@ -90,9 +90,10 @@ def part1():
     filtered = list(dict.fromkeys([x for x in allAfters if x not in ordering]))
     ordering += filtered
 
-    for item in items:
-        print(item.value, item.afters)
-    print(ordering)
+    # For debugging: 
+    # for item in items:
+    #     print(item.value, item.afters)
+    # print(ordering)
 
     valids = []
     for update in updates:
