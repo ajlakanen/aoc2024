@@ -34,9 +34,18 @@ def part1():
             item = list(filter(lambda item: item.value == rule[0], ordering))[0]
             item.after.append(rule[1])
     
-
+    items = []
+    for item in ordering:
+        right = len(items)-1
+        location = 0
+        for after 
+        if right < location:
+            items.insert(location, item.value)
+            continue
+        
+        
     # map(lambda item: print(item.value, item.after), ordering)
     # ordering.map(lambda item: print(item.value, item.after))
-    # print(ordering)
+    print(items)
 
 part1()
