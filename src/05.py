@@ -73,6 +73,21 @@ class Graph:
         else:
             self.order.reverse()
             return self.order
+    
+    def count_from(self, node):
+        if node in self.result:
+            return self.result[node]
+        
+        path_count = 0
+        for next_node in self.graph[node]:
+            path_count += self.count_from(next_node)
+        
+        self.result[node] = path_count
+        return path_count
+        
+    def count_paths(self, x, y):
+        self.result = {y: 1}
+        return self.count_from(x)
 
 
 class Item:
