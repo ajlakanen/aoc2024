@@ -1,7 +1,4 @@
-import functools
-import itertools
 import math
-import pytest
 
 # Read the file
 
@@ -92,12 +89,6 @@ class Graph:
         self.result = {y: 1}
         return self.count_from(x)
 
-
-class Item:
-    """Class for items in the ordering list"""
-    def __init__(self, value, afters):
-        self.value = value
-        self.afters = afters
 
 
 def isUpdateValid(update, ordering):
