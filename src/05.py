@@ -26,8 +26,10 @@ while i < len(lines):
 
 class Graph:
     """Class for a directed graph"""
+
     """Thanks: Antti Laaksonen / Tietorakenteet ja algoritmit"""
     """https://tira.mooc.fi/syksy-2023/osa13/"""
+
     def __init__(self):
         self.nodes = []
         self.graph = {node: [] for node in self.nodes}
@@ -39,7 +41,7 @@ class Graph:
     def add_edge(self, a, b):
         self.graph[a].append(b)
 
-    def visit(self, node, updateNodes):
+    def visit(self, node, partialNodes):
         if self.state[node] == 1:
             self.cycle = True
             return
@@ -48,13 +50,15 @@ class Graph:
 
         self.state[node] = 1
         for next_node in self.graph[node]:
-            if next_node in updateNodes:
-                self.visit(next_node, updateNodes)
+            if next_node in partialNodes:
+                self.visit(next_node, partialNodes)
 
         self.state[node] = 2
         self.order.append(node)
 
-    def createTopologicalOrder(self, updateNodes=None):
+    def createTopologicalOrder(self, partialNodes=None):
+        """Create a (partial) topological order of the graph"""
+        """Use partialNodes to create a partial order"""
         self.state = {}
         for node in self.nodes:
             self.state[node] = 0
@@ -63,32 +67,31 @@ class Graph:
         self.cycle = False
 
         for node in self.nodes:
-            if not node in updateNodes:
+            if not node in partialNodes:
                 continue
             if self.state[node] == 0:
-                self.visit(node, updateNodes)
+                self.visit(node, partialNodes)
 
         if self.cycle:
             return None
         else:
             self.order.reverse()
             return self.order
-    
+
     def count_from(self, node):
         if node in self.result:
             return self.result[node]
-        
+
         path_count = 0
         for next_node in self.graph[node]:
             path_count += self.count_from(next_node)
-        
+
         self.result[node] = path_count
         return path_count
-        
+
     def count_paths(self, x, y):
         self.result = {y: 1}
         return self.count_from(x)
-
 
 
 def isUpdateValid(update, ordering):
@@ -103,6 +106,7 @@ def isUpdateValid(update, ordering):
                 break
     return True
 
+
 def part1():
     items = []
 
@@ -111,26 +115,25 @@ def part1():
     # Go through all rules
     for rule in rules:
         # Add the item if its value is not already in the list
-
         if rule[0] not in g.nodes:
             g.add_node(rule[0])
         if rule[1] not in g.nodes:
             g.add_node(rule[1])
-        
         g.add_edge(rule[0], rule[1])
 
     valids = []
     for update in updates:
         ordering = g.createTopologicalOrder(update)
         if isUpdateValid(update, ordering):
-            print(update, "valid")
+            #print(update, "valid")
             valids.append(update)
         else:
             pass
-            print(update, "invalid")
+             #print(update, "invalid")
 
     sum = 0
     for valid in valids:
+        # Take the middle value
         sum += valid[math.floor(len(valid) / 2)]
     print(sum)
 
