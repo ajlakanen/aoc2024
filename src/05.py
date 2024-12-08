@@ -106,10 +106,7 @@ def isUpdateValid(update, ordering):
                 break
     return True
 
-
-def part1():
-    items = []
-
+def makeGraph():
     g = Graph()
 
     # Go through all rules
@@ -120,6 +117,10 @@ def part1():
         if rule[1] not in g.nodes:
             g.add_node(rule[1])
         g.add_edge(rule[0], rule[1])
+    return g
+
+def part1():
+    g = makeGraph()
 
     valids = []
     for update in updates:
@@ -137,5 +138,19 @@ def part1():
         sum += valid[math.floor(len(valid) / 2)]
     print(sum)
 
+def part2():
+    g = makeGraph()
+
+    invalids = []
+    sum = 0
+    for update in updates:
+        ordering = g.createTopologicalOrder(update)
+        if not isUpdateValid(update, ordering):
+            invalids.append(update)
+            sum += sorted(update, key=lambda x: ordering.index(x))[math.floor(len(update) / 2)]
+    print(sum)
+            
+
 
 part1()
+part2()
