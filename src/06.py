@@ -1,12 +1,10 @@
 # Read the file
 
-file = open("data/06.txt", "r")
+file = open("data/06-example.txt", "r")
 content = file.read()
 lines = content.split("\n")
 
 # Parse the input
-
-
 start_char = "^"
 start_location = (0, 0)
 
@@ -22,7 +20,7 @@ def isInBounds(i, j):
     return i >= 0 and j >= 0 and i < len(lines) and j < len(lines[i])
 
 
-def find_start_location():
+def find_start_location(lines):
     for line in lines:
         for char in line:
             if char == start_char:
@@ -33,24 +31,17 @@ def find_start_location():
 
 def part1():
     direction = 0
-
-    loc_now = find_start_location()
-
+    loc_now = find_start_location(lines)
     while True:
         next_loc = (
             loc_now[0] + directions[direction][0],
             loc_now[1] + directions[direction][1],
         )
         if not isInBounds(next_loc[0], next_loc[1]):
-            print("Out of bounds", next_loc, direction)
             break
         char = lines[next_loc[0]][next_loc[1]]
         if char != "#":
-            lines[next_loc[0]] = (
-                lines[next_loc[0]][: next_loc[1]]
-                + "X"
-                + lines[next_loc[0]][next_loc[1] + 1 :]
-            )
+            markLocationWith(lines, next_loc, "X")
             loc_now = next_loc
         else:
             direction = (direction + 1) % 4
@@ -62,9 +53,42 @@ def part1():
     print(count)
 
 
+def markLocationWith(lines, location, char):
+    lines[location[0]] = (
+        lines[location[0]][: location[1]] + char + lines[location[0]][location[1] + 1 :]
+    )
+
+
+def checkIfLoop(lines, starting_loc, direction):
+    loc_now = starting_loc
+    count = 0
+    while True:
+        next_loc = (
+            loc_now[0] + directions[direction][0],
+            loc_now[1] + directions[direction][1],
+        )
+        if not isInBounds(next_loc[0], next_loc[1]):
+            return False
+        char = lines[next_loc[0]][next_loc[1]]
+        if char != "#" and char != "O":
+            markLocationWith(lines, next_loc, "X")
+            loc_now = next_loc
+        else:
+            direction = (direction + 1) % 4
+        count += 1
+        if count > len(lines) * len(lines[0]):
+            break
+    for line in lines:
+        print(line)
+    print("\n")
+
+    return True
+
+
 def part2():
     direction = 0
-    loc_now = find_start_location()
+    lines = content.split("\n")
+    loc_now = find_start_location(lines)
     count = 0
 
     while True:
@@ -72,21 +96,27 @@ def part2():
             loc_now[0] + directions[direction][0],
             loc_now[1] + directions[direction][1],
         )
-        if not isInBounds(next_loc[0], next_loc[1]):
-            print("Out of bounds", next_loc, direction)
-            break
-        char = lines[next_loc[0]][next_loc[1]]
-        if char != "#":
-            lines[next_loc[0]] = (
-                lines[next_loc[0]][: next_loc[1]]
-                + "X"
-                + lines[next_loc[0]][next_loc[1] + 1 :]
-            )
-            loc_now = next_loc
-            count += 1
-        else:
-            direction = (direction + 1) % 4
 
+        if not isInBounds(next_loc[0], next_loc[1]):
+            break
+
+        char = lines[next_loc[0]][next_loc[1]]
+        if char == "#" or char == "O":
+            direction = (direction + 1) % 4
+            continue
+
+        # Insert an obstacle and check if that causes a loop
+        markLocationWith(lines, next_loc, "O")
+
+        loop_check_starting_loc = (loc_now[0], loc_now[1])
+        loopLines = lines.copy()
+        if checkIfLoop(loopLines, loop_check_starting_loc, direction):
+            count += 1
+
+        markLocationWith(lines, next_loc, "X")
+        loc_now = next_loc
+    print(count)
 
 
 part1()
+part2()
