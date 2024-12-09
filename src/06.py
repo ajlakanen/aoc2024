@@ -1,8 +1,9 @@
 # Read the file
 
-file = open("data/06-example.txt", "r")
+file = open("data/06.txt", "r")
 content = file.read()
 lines = content.split("\n")
+freshLines = lines.copy()
 
 # Parse the input
 start_char = "^"
@@ -59,37 +60,37 @@ def markLocationWith(lines, location, char):
     )
 
 
-def checkIfLoop(lines, starting_loc, direction):
+def checkIfLoop(O_loc, lines, starting_loc, dir):
     loc_now = starting_loc
     count = 0
     while True:
         next_loc = (
-            loc_now[0] + directions[direction][0],
-            loc_now[1] + directions[direction][1],
+            loc_now[0] + directions[dir][0],
+            loc_now[1] + directions[dir][1],
         )
         if not isInBounds(next_loc[0], next_loc[1]):
-            return False
+            return (False, None)
         char = lines[next_loc[0]][next_loc[1]]
         if char != "#" and char != "O":
             markLocationWith(lines, next_loc, "X")
             loc_now = next_loc
         else:
-            direction = (direction + 1) % 4
+            dir = (dir + 1) % 4
         count += 1
+        # Stupidily make sure that we have looped
+        # for so long that each cell has been visited
         if count > len(lines) * len(lines[0]):
             break
-    for line in lines:
-        print(line)
-    print("\n")
 
-    return True
+    return (True, O_loc)
 
 
 def part2():
     direction = 0
     lines = content.split("\n")
     loc_now = find_start_location(lines)
-    count = 0
+
+    obstacles_causing_loop = []
 
     while True:
         next_loc = (
@@ -106,16 +107,17 @@ def part2():
             continue
 
         # Insert an obstacle and check if that causes a loop
-        markLocationWith(lines, next_loc, "O")
-
-        loop_check_starting_loc = (loc_now[0], loc_now[1])
-        loopLines = lines.copy()
-        if checkIfLoop(loopLines, loop_check_starting_loc, direction):
-            count += 1
+        linesforLoop = freshLines.copy()
+        markLocationWith(linesforLoop, next_loc, "O")
+        loop_check_starting_loc = find_start_location(freshLines)
+        obs_loc = (next_loc[0], next_loc[1])
+        if checkIfLoop(obs_loc, linesforLoop, loop_check_starting_loc, 0)[0]:
+            if obs_loc not in obstacles_causing_loop:
+                obstacles_causing_loop.append(next_loc)
 
         markLocationWith(lines, next_loc, "X")
         loc_now = next_loc
-    print(count)
+    print(len(obstacles_causing_loop))
 
 
 part1()
