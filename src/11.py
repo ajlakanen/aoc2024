@@ -62,12 +62,11 @@ def handle(keysAndValues):
     return keysAndValuesNow
 
 def part2():
-    i = 0
     keysAndValues = {}
     for num in nums:
         keysAndValues[num] = 1
 
-    for i in range(75):
+    for _ in range(75):
         keysAndValues = handle(keysAndValues)
 
     print(sum(keysAndValues.values()))
