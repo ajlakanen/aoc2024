@@ -32,8 +32,45 @@ def part1():
             else:
                 nextNums.append(numsNow[j] * 2024)
         numsNow = nextNums
-        # print(numsNow)
         i += 1
     print(len(numsNow))
 
+def add(dict, key, value):
+    if key in dict:
+        dict[key] += value
+    else:
+        dict[key] = value
+
+def handle(keysAndValues):
+    keysAndValuesNow = keysAndValues.copy()
+    for key in keysAndValues:
+        if key == 0:
+            add(keysAndValuesNow, 1, keysAndValues[key])
+            keysAndValuesNow[key] -= keysAndValues[key]
+        elif getLength(key) % 2 != 0:
+            add(keysAndValuesNow, key * 2024, keysAndValues[key])
+            keysAndValuesNow[key] -= keysAndValues[key]
+        else:
+            # cut in half
+            length = getLength(key)
+            left = key // (10 ** (length // 2))
+            right = key % (10 ** (length // 2))
+            add(keysAndValuesNow, left, keysAndValues[key])
+            add(keysAndValuesNow, right, keysAndValues[key])
+            keysAndValuesNow[key] -= keysAndValues[key]
+
+    return keysAndValuesNow
+
+def part2():
+    i = 0
+    keysAndValues = {}
+    for num in nums:
+        keysAndValues[num] = 1
+
+    for i in range(75):
+        keysAndValues = handle(keysAndValues)
+
+    print(sum(keysAndValues.values()))
+
 part1()
+part2()
