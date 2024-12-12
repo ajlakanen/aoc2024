@@ -1,9 +1,9 @@
-file = open("data/12-example2.txt", "r")
+file = open("data/12-example3.txt", "r")
 content = file.read()
 lines = content.split("\n")
 
 
-def floodFill(i, j, char, replacement=" "):
+def floodFill(lines, i, j, char, replacement=" "):
     # 1. Set Q to the empty queue or stack.
     Q = []
     # 2. Add node to the end of Q.
@@ -33,9 +33,33 @@ def floodFill(i, j, char, replacement=" "):
 def part1():
     for line in lines:
         print(line)
-    floodFill(1, 2, "O")
+
+    # get all different characters from lines
+    charsAndLines = {}
     for line in lines:
-        print(line)
+        for key in line:
+            if key not in charsAndLines:
+                charsAndLines[key] = []
+
+    print(charsAndLines)
+
+    for key in charsAndLines:
+        charLines = []
+        for line in lines:
+            charLine = ""
+            for c in line:
+                if c != key:
+                    charLine += " "
+                else:
+                    charLine += c
+            charLines.append(charLine)
+        charsAndLines[key] = charLines
+        for line in charsAndLines[key]:
+            print(line)
+        # lines = floodFill(lines, 1, 2, "O")
+        # for line in lines:
+        #    print(line)
+    floodFill
 
 
 part1()
