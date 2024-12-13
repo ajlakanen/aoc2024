@@ -80,9 +80,6 @@ def findPerimeter(lines, char):
 
 
 def part1():
-    for line in lines:
-        print(line)
-
     # get the set of characters
     charsAndLines = {}
     for line in lines:
