@@ -1,5 +1,7 @@
 import re 
-file = open("data/13-example.txt", "r")
+import numpy as np
+
+file = open("data/13.txt", "r")
 content = file.read()
 lines = content.split("\n")
 
@@ -23,5 +25,19 @@ while i < len(lines):
     i += 2
     machines.append(Machine(a,b,prize))
 
+sum = 0
 for machine in machines:
-    print(machine.a, machine.b, machine.price)
+    # print(machine.a, machine.b, machine.price)
+    A = np.array([[machine.a[0], machine.b[0]], [machine.a[1], machine.b[1]]])
+    y = np.array([machine.price[0], machine.price[1]])
+    x = np.linalg.solve(A, y)
+    if x[0] <= 0 or x[1] <= 0:
+        continue
+    if x[0] >= 100 or x[1] >= 100:
+        continue
+
+    print(x)
+    if all(list(map(lambda x: round(x, 7).is_integer(), x))):
+        sum += 3 * x[0] + x[1]
+    
+print(sum)
