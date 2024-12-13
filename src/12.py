@@ -1,4 +1,4 @@
-file = open("data/12-example3.txt", "r")
+file = open("data/12.txt", "r")
 content = file.read()
 lines = content.split("\n")
 
@@ -30,36 +30,85 @@ def floodFill(lines, i, j, char, replacement=" "):
             Q.append([n[0], n[1] + 1])  # east
     # 7. Continue looping until Q is exhausted.
 
+
+def getLinesWithChar(lines, char):
+    charLines = []
+    for line in lines:
+        charLine = ""
+        for c in line:
+            if c != char:
+                charLine += " "
+            else:
+                charLine += c
+        charLines.append(charLine)
+    return charLines
+
+
+def getFirstPosition(lines, char):
+    for i in range(len(lines)):
+        for j in range(len(lines[i])):
+            if lines[i][j] == char:
+                return (i, j)
+    return (-1, -1)
+
+
+def numOfNeighbours(lines, i, j, char):
+    count = 0
+
+    # up
+    if i - 1 >= 0 and lines[i - 1][j] == char:
+        count += 1
+    # down
+    if i + 1 < len(lines) and lines[i + 1][j] == char:
+        count += 1
+    # left
+    if j - 1 >= 0 and lines[i][j - 1] == char:
+        count += 1
+    # right
+    if j + 1 < len(lines[i]) and lines[i][j + 1] == char:
+        count += 1
+    return count
+
+
+def findPerimeter(lines, char):
+    perimeter = 0
+    for i in range(len(lines)):
+        for j in range(len(lines[0])):
+            if lines[i][j] == char:
+                perimeter += 4 - numOfNeighbours(lines, i, j, char)
+    return perimeter
+
+
 def part1():
     for line in lines:
         print(line)
 
-    # get all different characters from lines
+    # get the set of characters
     charsAndLines = {}
     for line in lines:
         for key in line:
             if key not in charsAndLines:
                 charsAndLines[key] = []
 
-    print(charsAndLines)
-
+    # get lines showing only the specific character
     for key in charsAndLines:
-        charLines = []
-        for line in lines:
-            charLine = ""
-            for c in line:
-                if c != key:
-                    charLine += " "
-                else:
-                    charLine += c
-            charLines.append(charLine)
-        charsAndLines[key] = charLines
-        for line in charsAndLines[key]:
-            print(line)
-        # lines = floodFill(lines, 1, 2, "O")
-        # for line in lines:
-        #    print(line)
-    floodFill
+        charsAndLines[key] = getLinesWithChar(lines, key)
+
+    # flood fill
+    prices = 0
+    for key in charsAndLines:
+        # get the first position of the character
+        (i, j) = (-1, -1)
+        while getFirstPosition(charsAndLines[key], key) != (-1, -1):
+            (i, j) = getFirstPosition(charsAndLines[key], key)
+            floodFill(charsAndLines[key], i, j, key, "1")
+            # We assume that after there are no
+            # 1s outside of the flood filled area
+            perimeter = findPerimeter(charsAndLines[key], "1")
+            area = sum([line.count("1") for line in charsAndLines[key]])
+            prices += perimeter * area
+            floodFill(charsAndLines[key], i, j, "1", " ")
+    print(prices)
 
 
 part1()
