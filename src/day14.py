@@ -11,13 +11,18 @@ GRID_SIZE = (101, 103)
 class Grid:
     def __init__(self, size):
         self.size = size
-        self.grid = [[0 for _ in range(size[0])] for _ in range(size[1])]
+        self.grid  = []
+        for _ in range(size[1]):
+            row = []
+            for _ in range(size[0]):
+                row.append([])
+            self.grid.append(row)
 
     def add(self, x, y, robot):
         self.grid[y][x].append(robot)
 
     def remove(self, x, y, robot):
-        self.grid[y][x].remove(robot)
+        self.grid[y][x] = [r for r in self.grid[y][x] if r != robot]
 
     def get(self, x, y):
         return self.grid[y][x]
@@ -26,33 +31,36 @@ class Grid:
         return len(self.grid[y][x])
 
 class Robot:
-    def __init__(self, position, direction, grid_size):
+    def __init__(self, position, direction, grid): 
         self.X = position[0]
         self.Y = position[1]
         self.dirX = direction[0]
         self.dirY = direction[1]
-        self.grid_size = grid_size
+        self.grid = grid
 
     def move(self):
         self.X += self.dirX
         self.Y += self.dirY
         if self.X < 0:
-            self.X += self.grid_size[0]
-        if self.X >= self.grid_size[0]:
-            self.X -= self.grid_size[0]
+            self.X += self.grid.size[0]
+        if self.X >= self.grid.size[0]:
+            self.X -= self.grid.size[0]
         if self.Y < 0:
-            self.Y += self.grid_size[1]
-        if self.Y >= self.grid_size[1]:
-            self.Y -= self.grid_size[1]
+            self.Y += self.grid.size[1]
+        if self.Y >= self.grid.size[1]:
+            self.Y -= self.grid.size[1]
+        self.grid.remove(self.X, self.Y, self)
+        self.grid.add(self.X, self.Y, self)
 
-
-def parse(lines):
+def parse(lines, grid):
     machines = []
     for line in lines:
         posAndDir = re.split(r"[=,\s]", line)
         position = (int(posAndDir[1]), int(posAndDir[2]))  # (x, y)
         direction = (int(posAndDir[4]), int(posAndDir[5]))  # (dx, dy)
-        machines.append(Robot(position, direction, GRID_SIZE))
+        r = Robot(position, direction, grid)
+        grid.add(position[0], position[1], r)
+        machines.append(r)
     return machines
 
 
@@ -106,7 +114,8 @@ QUADRANTS = [
 
 
 def part1():
-    machines = parse(lines)
+    grid = Grid(GRID_SIZE)
+    machines = parse(lines, grid)
 
     for _ in range(100):
         for machine in machines:
@@ -122,54 +131,19 @@ def part1():
                         count += 1
         multiplied *= count
     print(multiplied)
-
-
-def checkIfQuadrantsMirrored(counts):
-    print("checking mirroring")
-    height = GRID_SIZE[1]
-    width = GRID_SIZE[0]
-
-    quadrants = [
-        [
-            (0, math.floor(width / 2)),
-            (0, math.floor(height / 2)),
-        ],  # top left: (startX, endX), (startY, endY)
-        [
-            (math.ceil(width / 2), width),
-            (0, math.floor(height / 2)),
-        ],  # top right: (startX, endX), (startY, endY)
-        [
-            (0, math.floor(width / 2)),
-            (math.ceil(height / 2), height),
-        ],  # bottom left
-        [
-            (math.ceil(width / 2), width),
-            (math.ceil(height / 2), height),
-        ],  # bottom
-    ]
-
-    # compare top left and top right
-    for x in range(quadrants[0][0][0], quadrants[0][0][1]):  # top left
-        for y in range(quadrants[0][1][0], quadrants[0][1][1]):
-            countL = counts[y][x]
-            countR = counts[y][quadrants[1][0][1] - x - 1]
-            if countL != countR:
-                return False
-    return True
-
+    #printMachines(machines)
 
 def part2():
-    machines = parse(lines)
+    grid = Grid(GRID_SIZE)
+    machines = parse(lines, grid)
     for i in range(100):
         print(i)
         for machine in machines:
             machine.move()
             a = countMachines(machines)
             print("counted")
-            if checkIfQuadrantsMirrored(a):                
-                printMachines(machines)
-                return
+            # TODO
 
 
-# part1()
-part2()
+part1()
+# part2()
