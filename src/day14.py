@@ -8,10 +8,11 @@ lines = content.split("\n")
 # GRID_SIZE = (11,7) # columns, rows
 GRID_SIZE = (101, 103)
 
+
 class Grid:
     def __init__(self, size):
         self.size = size
-        self.grid  = []
+        self.grid = []
         for _ in range(size[1]):
             row = []
             for _ in range(size[0]):
@@ -20,18 +21,20 @@ class Grid:
 
     def add(self, x, y, robot):
         self.grid[y][x].append(robot)
+        pass
 
     def remove(self, x, y, robot):
         self.grid[y][x] = [r for r in self.grid[y][x] if r != robot]
 
     def get(self, x, y):
         return self.grid[y][x]
-    
+
     def count(self, x, y):
         return len(self.grid[y][x])
 
+
 class Robot:
-    def __init__(self, position, direction, grid): 
+    def __init__(self, position, direction, grid):
         self.X = position[0]
         self.Y = position[1]
         self.dirX = direction[0]
@@ -39,6 +42,7 @@ class Robot:
         self.grid = grid
 
     def move(self):
+        self.grid.remove(self.X, self.Y, self)
         self.X += self.dirX
         self.Y += self.dirY
         if self.X < 0:
@@ -49,8 +53,8 @@ class Robot:
             self.Y += self.grid.size[1]
         if self.Y >= self.grid.size[1]:
             self.Y -= self.grid.size[1]
-        self.grid.remove(self.X, self.Y, self)
         self.grid.add(self.X, self.Y, self)
+
 
 def parse(lines, grid):
     machines = []
@@ -126,12 +130,10 @@ def part1():
         count = 0
         for x in range(quadrant[0][0], quadrant[0][1]):
             for y in range(quadrant[1][0], quadrant[1][1]):
-                for machine in machines:
-                    if machine.X == x and machine.Y == y:
-                        count += 1
+                count += grid.count(x, y)
         multiplied *= count
     print(multiplied)
-    #printMachines(machines)
+
 
 def part2():
     grid = Grid(GRID_SIZE)
